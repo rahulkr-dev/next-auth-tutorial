@@ -2,7 +2,7 @@
 
 export const AuthHeader = ({label}:{label:string})=>{
     return (
-        <div>
+        <div className="text-center">
             {label}
         </div>
     )
