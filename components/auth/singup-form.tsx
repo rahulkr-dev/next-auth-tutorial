@@ -17,7 +17,7 @@ import { FormError } from "@/components/form-error";
 import { FormSuccess } from "@/components/form-success";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { login } from "@/actions/login";
+import { signup } from "@/actions/singup";
 
 export const SignupForm = () => {
     const [isPending,startTransition] = useTransition()
@@ -37,7 +37,7 @@ export const SignupForm = () => {
     setError("")
     setSuccess("")
     startTransition(()=>{
-        login(values)
+      signup(values)
         .then((data)=>{
             if(data.error){
                 setError(data.error)
