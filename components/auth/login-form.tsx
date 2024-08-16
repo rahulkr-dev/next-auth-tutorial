@@ -1,9 +1,10 @@
 "use client"
+import { useTransition,useState } from "react";
 import { z } from "zod";
 import { AuthCardWrapper } from "./auth-card-wrapper";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { loginSchema } from "@/app/schemas";
+import { loginSchema } from "@/schemas";
 import {
   Form,
   FormField,
@@ -12,10 +13,16 @@ import {
   FormMessage,
   FormLabel,
 } from "@/components/ui/form";
+import { FormError } from "@/components/form-error";
+import { FormSuccess } from "@/components/form-success";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
+import { login } from "@/actions/login";
 
 export const LoginForm = () => {
+    const [isPending,startTransition] = useTransition()
+    const [success,setSuccess] = useState("")
+    const [error,setError] = useState("")
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -25,11 +32,24 @@ export const LoginForm = () => {
   });
 
   const onSubmit = (values:z.infer<typeof loginSchema>)=>{
-    console.log(values)
+    // console.log(values)
+    setError("")
+    setSuccess("")
+    startTransition(()=>{
+        login(values)
+        .then((data)=>{
+            if(data.error){
+                setError(data.error)
+            }
+            if(data.message){
+                setSuccess(data.message)
+            }
+        })
+    })
   }
   return (
     <AuthCardWrapper
-      headerTitle="welcome back"
+      headerTitle="Welcome back"
       backButtonTitle="don't have an account"
       backButtonHref="/auth/signup"
       socials={true}
@@ -65,7 +85,9 @@ export const LoginForm = () => {
             )}
           />
 
-          <Button className="w-full" type="submit">Login</Button>
+            <FormError message={error} />
+            <FormSuccess message={success} />
+          <Button disabled={isPending} className="w-full" type="submit">Login</Button>
         </form>
       </Form>
            
