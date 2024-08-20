@@ -4,6 +4,7 @@ import authConfig from "@/auth.config";
 import { PrismaClient } from "@prisma/client";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { getUserById } from "./data/user";
+import { db } from "./lib/db";
 
 const prisma = new PrismaClient();
 
@@ -13,6 +14,19 @@ export const {
   signIn,
   signOut,
 } = NextAuth({
+  pages:{
+    error: "/auth/error",
+    signIn: "/auth/login",
+  },
+  events: {
+    async linkAccount({ user }) {
+      console.log(user,"user Inside linkAccountEvent")
+      await db.user.update({
+        where: { id: user.id },
+        data: { emailVerified: new Date() },
+      });
+    },
+  },
   callbacks: {
     async session({ session, token }) {
       if (token.sub) session.user.id = token.sub;

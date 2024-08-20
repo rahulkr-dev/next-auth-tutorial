@@ -18,8 +18,11 @@ import { FormSuccess } from "@/components/form-success";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { login } from "@/actions/login";
+import { useSearchParams } from 'next/navigation'
 
 export const LoginForm = () => {
+  const searchParams = useSearchParams()
+  const oauthError = searchParams.get("error") === "OAuthAccountNotLinked" ? "Account linked with different provider" : ""
     const [isPending,startTransition] = useTransition()
     const [success,setSuccess] = useState("")
     const [error,setError] = useState("")
@@ -38,12 +41,12 @@ export const LoginForm = () => {
     startTransition(()=>{
         login(values)
         .then((data)=>{
-            if(data.error){
-                setError(data.error)
+            if(data?.error){
+                setError(data?.error)
             }
-            if(data.message){
-                setSuccess(data.message)
-            }
+            // if(data?.message){
+            //     setSuccess(data?.message)
+            // }
         })
     })
   }
@@ -85,7 +88,7 @@ export const LoginForm = () => {
             )}
           />
 
-            <FormError message={error} />
+            <FormError message={error || oauthError} />
             <FormSuccess message={success} />
           <Button disabled={isPending} className="w-full" type="submit">Login</Button>
         </form>
